@@ -18,7 +18,7 @@ app.use(express.static("public"));
 app.use(express.static("uploads"));
 
 /* Enable cors */
-app.use(cors());
+app.use(cors("*"));
 
 app.use("/auth", Auth.router);
 
@@ -27,6 +27,7 @@ const port = process.env.PORT;
 /* Global root dir */
 globalThis.ROOT_DIR = path.resolve(__dirname);
 
+
 app.listen(port, () => {
-  return console.log(`Server is Running on Port ${port}`);
+  console.log(`Server is Running on Port ${port}`);
 });

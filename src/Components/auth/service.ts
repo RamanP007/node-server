@@ -3,24 +3,22 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
-class UserService {
+class AuthService {
   private readonly prisma = new PrismaClient();
 
   private isEmailExist = async (email: string) => {
     const response = await this.prisma.user.count({
       where: { email }
     })
-    console.log(response)
     if (response) return true;
     return false;
   };
 
   private isMobileExist = async (phone: string) => {
     const response = await this.prisma.user.count({
-      where: { phone }
+      where: { phone: phone.toString() }
     })
     if (response) return true;
-
     return false;
   };
 
@@ -42,15 +40,16 @@ class UserService {
     fullname: string,
     phone: string
   ) => {
-    if (await this.isEmailExist(email)) return new Error('Email already Exist');
+    const isEmailExist = await this.isEmailExist(email);
+    if (isEmailExist) return new Error('Email already Exist');
 
-    if (await this.isMobileExist(phone)) return new Error('Mobile already Exist');
-
-    const hashedPassword = await this.hashedPassword(password);
+    const isPhoneExist = await this.isMobileExist(phone)
+    if (isPhoneExist) return new Error('Mobile already Exist');
+    const hashedPassword = this.hashedPassword(password);
 
     const user = await this.prisma.user.create({
       data: {
-        email, password: hashedPassword, fullname, phone
+        email, password: hashedPassword, fullname, phone: phone.toString()
       }
     })
 
@@ -59,6 +58,7 @@ class UserService {
       name: user.fullname,
       email: user.email
     }
+
 
     return this.generateJWTToken(tokenData);
   };
@@ -78,4 +78,4 @@ class UserService {
   }
 }
 
-export default UserService;
+export default AuthService;

@@ -11,18 +11,22 @@ datasource db {
 }
 
 enum UserType {
-  USER
-  ADMIN
+  User   @map("user")
+  Admin  @map("admin")
+  Vendor @map("vendor")
+
+  @@map("user_type")
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
+  id        String    @id @default(uuid())
   fullname  String?
   email     String    @unique
   phone     String?   @unique
   password  String?
+  googleId  String?
   isActive  Int       @default(0) @map("is_active")
-  userType  UserType  @default(USER) @map("user_type")
+  userType  UserType  @default(User) @map("user_type")
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @map("updated_at")
 

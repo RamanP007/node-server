@@ -6,7 +6,6 @@ import {
   Length,
   Matches,
 } from "class-validator";
-import messages from "./messages";
 
 export class RegisterUserDTO {
   @IsString()
@@ -21,10 +20,14 @@ export class RegisterUserDTO {
   @Length(10, 12)
   mobile!: string | null;
 
+  @IsString()
+  @IsOptional()
+  googleId!: string | null
+
   @IsStrongPassword()
-  @Matches(/^(?=.*[A-Z])(?=.*[~!@#$%^&*()/_=+[\]{}|;:,.<>?-])(?=.*[0-9])(?=.*[a-z]).{8,14}$/, { message: messages.MSG005 })
+  @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, { message: 'Password too weak' })
   @IsNotEmpty()
-  password!: string | null;
+  password!: string;
 }
 
 export class LoginUserDTO {

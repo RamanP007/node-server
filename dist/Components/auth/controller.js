@@ -16,11 +16,11 @@ const service_1 = __importDefault(require("./service"));
 const messages_1 = __importDefault(require("./messages"));
 class AuthController {
     constructor() {
-        this.userService = new service_1.default;
+        this.authService = new service_1.default;
         this.register = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const args = req.body;
             try {
-                const response = yield this.userService.register(args.email, args.password, args.fullName, args.mobile);
+                const response = yield this.authService.register(args.email, args.password, args.fullName, args.mobile);
                 if (response instanceof Error) {
                     res.send({ status: 1, data: null, error: response.message });
                     return;
@@ -28,14 +28,14 @@ class AuthController {
                 res.send({ status: 1, data: response, error: null });
             }
             catch (error) {
-                console.log('error', error);
+                console.log(error);
                 res.send({ status: 0, data: null, error: (error === null || error === void 0 ? void 0 : error.message) || messages_1.default.MSG001 });
             }
         });
         this.login = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const args = req.body;
             try {
-                const response = yield this.userService.login(args.email, args.password);
+                const response = yield this.authService.login(args.email, args.password);
                 if (response instanceof Error) {
                     res.send({ status: 1, data: null, error: response.message });
                     return;

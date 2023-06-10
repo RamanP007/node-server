@@ -16,21 +16,20 @@ require("dotenv/config");
 const client_1 = require("@prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-class UserService {
+class AuthService {
     constructor() {
         this.prisma = new client_1.PrismaClient();
         this.isEmailExist = (email) => __awaiter(this, void 0, void 0, function* () {
             const response = yield this.prisma.user.count({
                 where: { email }
             });
-            console.log(response);
             if (response)
                 return true;
             return false;
         });
         this.isMobileExist = (phone) => __awaiter(this, void 0, void 0, function* () {
             const response = yield this.prisma.user.count({
-                where: { phone }
+                where: { phone: phone.toString() }
             });
             if (response)
                 return true;
@@ -46,14 +45,16 @@ class UserService {
             return jsonwebtoken_1.default.sign(data, process.env.SECRET, { expiresIn: '1d' });
         };
         this.register = (email, password, fullname, phone) => __awaiter(this, void 0, void 0, function* () {
-            if (yield this.isEmailExist(email))
+            const isEmailExist = yield this.isEmailExist(email);
+            if (isEmailExist)
                 return new Error('Email already Exist');
-            if (yield this.isMobileExist(phone))
+            const isPhoneExist = yield this.isMobileExist(phone);
+            if (isPhoneExist)
                 return new Error('Mobile already Exist');
-            const hashedPassword = yield this.hashedPassword(password);
+            const hashedPassword = this.hashedPassword(password);
             const user = yield this.prisma.user.create({
                 data: {
-                    email, password: hashedPassword, fullname, phone
+                    email, password: hashedPassword, fullname, phone: phone.toString()
                 }
             });
             const tokenData = {
@@ -78,5 +79,5 @@ class UserService {
         });
     }
 }
-exports.default = UserService;
+exports.default = AuthService;
 //# sourceMappingURL=service.js.map
